@@ -15,15 +15,38 @@ datasource db {
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id          Int      @id @default(autoincrement())
+    description String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
 
     createdBy   User   @relation(fields: [createdById], references: [id])
     createdById String
 
-    @@index([name])
+    images   Image[]
+    comments Comment[]
+    likes    User[]    @relation("PostLikes")
+}
+
+model Image {
+    id  Int    @id @default(autoincrement())
+    src String
+    alt String
+
+    post   Post @relation(fields: [postId], references: [id])
+    postId Int
+}
+
+model Comment {
+    id        Int      @id @default(autoincrement())
+    content   String
+    createdAt DateTime @default(now())
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+
+    post   Post @relation(fields: [postId], references: [id])
+    postId Int
 }
 
 // Necessary for Next auth
@@ -62,6 +85,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    likes         Post[]    @relation("PostLikes")
+    comments      Comment[]
 }
 
 model VerificationToken {
