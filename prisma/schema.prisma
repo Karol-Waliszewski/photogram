@@ -85,8 +85,10 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
-    likes         Post[]    @relation("PostLikes")
+    liked         Post[]    @relation("PostLikes")
     comments      Comment[]
+    followers     User[]    @relation("UserFollowers")
+    following     User[]    @relation("UserFollowers")
 }
 
 model VerificationToken {
