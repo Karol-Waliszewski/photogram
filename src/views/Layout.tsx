@@ -1,3 +1,4 @@
+import { Container } from "@/components/atoms/Container";
 import { cn } from "@/utils/cn";
 import { type PropsWithChildren } from "react";
 
@@ -8,8 +9,8 @@ export const Layout = ({
   ...props
 }: PropsWithChildren<LayoutProps>) => {
   return (
-    <div className={cn("container mx-auto px-2 py-4", className)} {...props}>
+    <Container className={cn("py-4", className)} variant={"slim"} {...props}>
       {children}
-    </div>
+    </Container>
   );
 };
