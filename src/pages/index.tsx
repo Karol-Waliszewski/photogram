@@ -1,9 +1,13 @@
 import { Button } from "@/components/atoms/Button";
 import { H1, Text } from "@/components/atoms/Typography";
-
+import { Posts } from "@/components/molecules/Posts";
 import { Layout } from "@/views/Layout";
 
+import { api } from "@/utils/api";
+
 const PostPage = () => {
+  const { data, isFetching, error } = api.post.getPosts.useQuery();
+
   return (
     <Layout className="pt-10">
       <H1>Post Page</H1>
@@ -19,6 +23,12 @@ const PostPage = () => {
       <Button className="mt-4" size={"lg"}>
         Lorem ipsum
       </Button>
+      <Posts
+        className="mt-10"
+        posts={data}
+        loading={isFetching}
+        error={error?.message}
+      />
     </Layout>
   );
 };
