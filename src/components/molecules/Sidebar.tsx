@@ -1,9 +1,10 @@
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/atoms/Button";
 import { ScrollArea } from "@/components/atoms/ScrollArea";
-import { H3, Large } from "@/components/atoms/Typography";
+import { Large } from "@/components/atoms/Typography";
 import { type LucideIcon } from "lucide-react";
 import { type Href, Link } from "@/components/atoms/Link";
+import { Logo } from "@/components/molecules/Logo";
 
 export type SidebarItem =
   | {
@@ -31,7 +32,7 @@ const Sidebar = ({ className, sections, activeHref = null }: SidebarProps) => {
   return (
     <div className={cn("border-r pb-12", className)}>
       <div className="space-y-4 py-4">
-        <H3 className="px-7 py-4">Photogram</H3>
+        <Logo className="px-7 py-4" />
         {sections.map((section, index) => (
           <div className="px-3 py-2" key={(section?.title ?? "") + index}>
             {section?.title && (
