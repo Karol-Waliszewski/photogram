@@ -19,15 +19,15 @@ export type Href =
   | `https://${string}`
   | `#${string}`;
 
-export const Link: React.FC<
-  PropsWithChildren<AnchorHTMLAttributes<HTMLAnchorElement> & { href: Href }>
-> = ({ href, children, ...props }) =>
-  href.startsWith("/") ? (
-    <LocalLink href={href} {...props}>
-      {children}
-    </LocalLink>
-  ) : (
-    <ExternalLink href={href} {...props}>
-      {children}
-    </ExternalLink>
-  );
+export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  href: Href;
+};
+
+export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ href, ...props }, ref) =>
+    href.startsWith("/") ? (
+      <LocalLink href={href} ref={ref} {...props} />
+    ) : (
+      <ExternalLink href={href} ref={ref} {...props} />
+    ),
+);
