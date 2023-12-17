@@ -18,11 +18,33 @@ const MyApp: AppType<{ session: Session | null }> = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <div className={cn("font-sans", fontSans.variable)}>
-        <Component {...pageProps} />
-      </div>
-    </SessionProvider>
+    <>
+      <style jsx global>{`
+        html {
+          font-family:
+            ${fontSans.style.fontFamily},
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            "Helvetica Neue",
+            Arial,
+            "Noto Sans",
+            sans-serif,
+            "Apple Color Emoji",
+            "Segoe UI Emoji",
+            "Segoe UI Symbol",
+            "Noto Color Emoji";
+        }
+      `}</style>
+      <SessionProvider session={session}>
+        <div className={cn("font-sans", fontSans.variable)}>
+          <Component {...pageProps} />
+        </div>
+      </SessionProvider>
+    </>
   );
 };
 
