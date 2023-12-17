@@ -31,3 +31,4 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
       <ExternalLink href={href} ref={ref} {...props} />
     ),
 );
+Link.displayName = "Link";
