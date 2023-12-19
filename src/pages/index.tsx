@@ -4,9 +4,11 @@ import { Posts } from "@/components/molecules/Posts";
 import { Layout } from "@/views/Layout";
 
 import { api } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 const PostPage = () => {
   const { data, isFetching, error } = api.post.getPosts.useQuery();
+  const { data: sessionData } = useSession();
 
   return (
     <Layout className="pt-10">
@@ -25,7 +27,13 @@ const PostPage = () => {
       </Button>
       <Posts
         className="mt-10"
-        posts={data?.map((post) => ({ ...post, likes: post.likes.length }))}
+        posts={data?.map((post) => ({
+          ...post,
+          likes: post.likes.length,
+          isFavourite: sessionData?.user
+            ? post.likes.some((like) => like.id === sessionData?.user.id)
+            : false,
+        }))}
         loading={isFetching}
         error={error?.message}
         onLikeButtonClick={(postId) => {
