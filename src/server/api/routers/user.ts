@@ -10,6 +10,8 @@ export const userRouter = createTRPCRouter({
   follow: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(({ ctx, input }) => {
+      if (input.userId === ctx.session.user.id)
+        throw new Error("You can't follow yourself");
       return ctx.db.$transaction([
         ctx.db.user.update({
           where: { id: ctx.session.user.id },
@@ -25,6 +27,8 @@ export const userRouter = createTRPCRouter({
   unfollow: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(({ ctx, input }) => {
+      if (input.userId === ctx.session.user.id)
+        throw new Error("You can't unfollow yourself");
       return ctx.db.$transaction([
         ctx.db.user.update({
           where: { id: ctx.session.user.id },
