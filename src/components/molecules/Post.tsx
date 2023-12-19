@@ -14,6 +14,7 @@ import { Star, StarOff, MessageCircle } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 
 export type PostProps = {
+  id: number;
   description: string;
   createdBy: {
     id: string;
@@ -23,14 +24,19 @@ export type PostProps = {
   images: { id: number; src: string; alt: string }[];
   likes: number;
   isFavourite?: boolean;
+  onLikeButtonClick?: (postId: number) => void;
+  onCommentButtonClick?: (postId: number) => void;
 };
 
 const Post = ({
+  id,
   description,
   images,
   createdBy,
   likes,
   isFavourite = false,
+  onLikeButtonClick,
+  onCommentButtonClick,
 }: PostProps) => {
   return (
     <Card>
@@ -74,14 +80,22 @@ const Post = ({
       </CardContent>
       <CardFooter className="flex flex-col items-start pb-4 pt-3">
         <div className="-ml-2 flex flex-row gap-1">
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onLikeButtonClick?.(id)}
+          >
             {isFavourite ? (
               <StarOff className="h-6 w-6" />
             ) : (
               <Star className="h-6 w-6" />
             )}
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onCommentButtonClick?.(id)}
+          >
             <MessageCircle className="h-6 w-6" />
           </Button>
         </div>

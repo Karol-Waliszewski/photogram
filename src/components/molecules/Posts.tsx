@@ -5,18 +5,28 @@ import { DataLoader } from "@/components/molecules/DataLoader";
 import { Post, type PostProps } from "@/components/molecules/Post";
 
 import { cn } from "@/utils/cn";
+import { type TypedOmit } from "@/utils/types";
 
 export type PostsProps = {
-  posts: PostProps[] | undefined;
+  posts:
+    | TypedOmit<PostProps, "onLikeButtonClick" | "onCommentButtonClick">[]
+    | undefined;
   loading?: boolean;
   error?: string | null;
   className?: string;
-};
-const Posts = ({ posts, className, loading, error }: PostsProps) => {
+} & Pick<PostProps, "onLikeButtonClick" | "onCommentButtonClick">;
+const Posts = ({
+  posts,
+  className,
+  loading,
+  error,
+  onLikeButtonClick,
+  onCommentButtonClick,
+}: PostsProps) => {
   return (
     <div
       className={cn(
-        "mx-auto max-w-screen-md space-y-6 lg:max-w-[500px]",
+        "mx-auto max-w-screen-md space-y-6 md:max-w-screen-sm lg:max-w-[500px]",
         className,
       )}
     >
@@ -35,7 +45,14 @@ const Posts = ({ posts, className, loading, error }: PostsProps) => {
           </>
         )}
       >
-        {posts?.map((post) => <Post {...post} />)}
+        {posts?.map((post) => (
+          <Post
+            key={post.id}
+            {...post}
+            onLikeButtonClick={onLikeButtonClick}
+            onCommentButtonClick={onCommentButtonClick}
+          />
+        ))}
       </DataLoader>
     </div>
   );

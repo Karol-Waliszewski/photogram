@@ -28,6 +28,12 @@ const PostPage = () => {
         posts={data?.map((post) => ({ ...post, likes: post.likes.length }))}
         loading={isFetching}
         error={error?.message}
+        onLikeButtonClick={(postId) => {
+          alert(postId);
+        }}
+        onCommentButtonClick={(postId) => {
+          alert(postId);
+        }}
       />
     </Layout>
   );
