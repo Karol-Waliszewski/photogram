@@ -25,7 +25,7 @@ const PostPage = () => {
       </Button>
       <Posts
         className="mt-10"
-        posts={data}
+        posts={data?.map((post) => ({ ...post, likes: post.likes.length }))}
         loading={isFetching}
         error={error?.message}
       />
