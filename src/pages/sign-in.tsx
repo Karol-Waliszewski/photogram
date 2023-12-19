@@ -50,6 +50,8 @@ const SignInPage = ({
           </div>
 
           <UserAuthForm providers={values(providers)} />
+
+          {/* TODO: Print auth error messages */}
         </div>
       </div>
     </div>
