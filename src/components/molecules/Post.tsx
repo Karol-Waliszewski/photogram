@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
 
 import { Star, StarOff, MessageCircle } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
+import { Tooltip } from "@/components/atoms/Tooltip";
 
 export type PostProps = {
   id: number;
@@ -80,24 +81,28 @@ const Post = ({
       </CardContent>
       <CardFooter className="flex flex-col items-start pb-4 pt-3">
         <div className="-ml-2 flex flex-row gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onLikeButtonClick?.(id)}
-          >
-            {isFavourite ? (
-              <StarOff className="h-6 w-6" />
-            ) : (
-              <Star className="h-6 w-6" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onCommentButtonClick?.(id)}
-          >
-            <MessageCircle className="h-6 w-6" />
-          </Button>
+          <Tooltip text={isFavourite ? "Unlike" : "Like"}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onLikeButtonClick?.(id)}
+            >
+              {isFavourite ? (
+                <StarOff className="h-6 w-6" />
+              ) : (
+                <Star className="h-6 w-6" />
+              )}
+            </Button>
+          </Tooltip>
+          <Tooltip text={"Comments"}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onCommentButtonClick?.(id)}
+            >
+              <MessageCircle className="h-6 w-6" />
+            </Button>
+          </Tooltip>
         </div>
         <div className="pb-2">
           <Small>
