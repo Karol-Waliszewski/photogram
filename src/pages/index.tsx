@@ -12,7 +12,7 @@ const PostPage = () => {
     refetchOnWindowFocus: false,
   });
   const { data: followers, refetch: refetchFollowers } =
-    api.user.getFollowers.useQuery(
+    api.user.getFollowings.useQuery(
       {
         userId: sessionData?.user.id ?? "",
       },
