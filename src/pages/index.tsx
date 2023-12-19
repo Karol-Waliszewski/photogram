@@ -7,16 +7,27 @@ import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
 
 const PostPage = () => {
-  const { data, isFetching, error } = api.post.getPosts.useQuery();
   const { data: sessionData } = useSession();
-  const { data: followers } = api.user.getFollowers.useQuery(
-    {
-      userId: sessionData?.user.id ?? "",
+  const { data, isFetching, error } = api.post.getPosts.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+  const { data: followers, refetch: refetchFollowers } =
+    api.user.getFollowers.useQuery(
+      {
+        userId: sessionData?.user.id ?? "",
+      },
+      { enabled: !!sessionData?.user.id, refetchOnWindowFocus: false },
+    );
+  const { mutate: followUser } = api.user.follow.useMutation({
+    onSuccess() {
+      void refetchFollowers();
     },
-    { enabled: !!sessionData?.user.id },
-  );
-  const { mutate: followUser } = api.user.follow.useMutation();
-  const { mutate: unfollowUser } = api.user.unfollow.useMutation();
+  });
+  const { mutate: unfollowUser } = api.user.unfollow.useMutation({
+    onSuccess() {
+      void refetchFollowers();
+    },
+  });
 
   return (
     <Layout className="pt-10">
