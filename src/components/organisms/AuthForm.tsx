@@ -20,6 +20,7 @@ const UserAuthForm = ({
     <div className={cn("flex w-full flex-col gap-4", className)} {...props}>
       {providers.map((provider) => (
         <Button
+          key={provider.id}
           variant="outline"
           type="button"
           disabled={loading}
