@@ -1,24 +1,31 @@
-import { Button } from "@/components/atoms/Button";
-import { H1, Text } from "@/components/atoms/Typography";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
+import { H1, Large } from "@/components/atoms/Typography";
 
 import { Layout } from "@/views/Layout";
+import { useSession } from "next-auth/react";
 
 const ProfilePage = () => {
+  const { data: sessionData } = useSession();
+
   return (
     <Layout className="pt-10">
       <H1>Profile</H1>
-      <Text>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores
-        deleniti ducimus modi voluptatem eos dignissimos fugiat saepe fugit
-        accusantium cum, odio atque soluta provident iure quasi quod.
-        Repudiandae, quis quibusdam. Lorem ipsum dolor, sit amet consectetur
-        adipisicing elit. Perspiciatis ab quas id porro a fugit corporis,
-        repudiandae quos omnis dolorem eligendi aut unde? Doloremque, voluptatum
-        aliquid at autem dolor voluptatem.
-      </Text>
-      <Button className="mt-4" size={"lg"}>
-        Lorem ipsum
-      </Button>
+      {sessionData?.user && (
+        <div className="mt-8 flex flex-row items-center gap-4">
+          {sessionData.user.image && (
+            <Avatar className="h-20 w-20">
+              <AvatarImage
+                src={sessionData?.user.image}
+                alt={sessionData?.user.name ?? ""}
+              />
+              <AvatarFallback />
+            </Avatar>
+          )}
+          <Large>
+            {sessionData.user.name} ({sessionData.user.email})
+          </Large>
+        </div>
+      )}
     </Layout>
   );
 };
