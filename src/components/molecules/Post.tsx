@@ -25,8 +25,11 @@ export type PostProps = {
   images: { id: number; src: string; alt: string }[];
   likes: number;
   isFavourite?: boolean;
+  isAuthorFollowed?: boolean;
+  isFollowButtonVisible?: boolean;
   onLikeButtonClick?: (postId: number) => void;
   onCommentButtonClick?: (postId: number) => void;
+  onFollowButtonClick?: (userId: string, isFollowed: boolean) => void;
 };
 
 const Post = ({
@@ -36,12 +39,15 @@ const Post = ({
   createdBy,
   likes,
   isFavourite = false,
+  isFollowButtonVisible = false,
+  isAuthorFollowed = false,
   onLikeButtonClick,
   onCommentButtonClick,
+  onFollowButtonClick,
 }: PostProps) => {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-3 py-4">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 py-4">
         <div className="flex flex-row items-center gap-3">
           <Avatar>
             <AvatarImage src={createdBy.image} alt={createdBy.name} />
@@ -54,6 +60,17 @@ const Post = ({
           </Avatar>
           <Large>{createdBy.name}</Large>
         </div>
+        {isFollowButtonVisible && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              onFollowButtonClick?.(createdBy.id, isAuthorFollowed)
+            }
+          >
+            {isAuthorFollowed ? "Unfollow" : "Follow"}
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="p-0">
         <AspectRatio ratio={1} className="overflow-hidden">
@@ -67,16 +84,6 @@ const Post = ({
               </SwiperSlide>
             ))}
           </Swiper>
-          {/* <div className="flex h-full snap-x snap-mandatory overflow-auto">
-            {images?.map((image, index) => (
-              <div
-                className="relative h-full min-w-full snap-center"
-                key={index}
-              >
-                <Image src={image.src} alt={image.alt} cover />
-              </div>
-            ))}
-          </div> */}
         </AspectRatio>
       </CardContent>
       <CardFooter className="flex flex-col items-start pb-4 pt-3">

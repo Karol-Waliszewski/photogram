@@ -9,6 +9,14 @@ import { useSession } from "next-auth/react";
 const PostPage = () => {
   const { data, isFetching, error } = api.post.getPosts.useQuery();
   const { data: sessionData } = useSession();
+  const { data: followers } = api.user.getFollowers.useQuery(
+    {
+      userId: sessionData?.user.id ?? "",
+    },
+    { enabled: !!sessionData?.user.id },
+  );
+  const { mutate: followUser } = api.user.follow.useMutation();
+  const { mutate: unfollowUser } = api.user.unfollow.useMutation();
 
   return (
     <Layout className="pt-10">
@@ -30,9 +38,14 @@ const PostPage = () => {
         posts={data?.map((post) => ({
           ...post,
           likes: post.likes.length,
+          isFollowButtonVisible:
+            sessionData?.user && post.createdById !== sessionData?.user.id,
           isFavourite: sessionData?.user
             ? post.likes.some((like) => like.id === sessionData?.user.id)
             : false,
+          isAuthorFollowed: followers?.some(
+            (follower) => follower.id === post.createdById,
+          ),
         }))}
         loading={isFetching}
         error={error?.message}
@@ -42,6 +55,9 @@ const PostPage = () => {
         onCommentButtonClick={(postId) => {
           alert(postId);
         }}
+        onFollowButtonClick={(userId, isFollowed) =>
+          isFollowed ? unfollowUser({ userId }) : followUser({ userId })
+        }
       />
     </Layout>
   );

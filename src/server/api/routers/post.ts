@@ -35,7 +35,11 @@ export const postRouter = createTRPCRouter({
   getPosts: publicProcedure.query(({ ctx }) => {
     return ctx.db.post.findMany({
       orderBy: { createdAt: "desc" },
-      include: { images: true, createdBy: true, likes: true },
+      include: {
+        images: true,
+        createdBy: true,
+        likes: true,
+      },
     });
   }),
 

@@ -8,13 +8,11 @@ import { cn } from "@/utils/cn";
 import { type TypedOmit } from "@/utils/types";
 
 export type PostsProps = {
-  posts:
-    | TypedOmit<PostProps, "onLikeButtonClick" | "onCommentButtonClick">[]
-    | undefined;
+  posts: TypedOmit<PostProps, keyof PostProps & `on${string}`>[] | undefined;
   loading?: boolean;
   error?: string | null;
   className?: string;
-} & Pick<PostProps, "onLikeButtonClick" | "onCommentButtonClick">;
+} & Pick<PostProps, keyof PostProps & `on${string}`>;
 const Posts = ({
   posts,
   className,
@@ -22,6 +20,7 @@ const Posts = ({
   error,
   onLikeButtonClick,
   onCommentButtonClick,
+  onFollowButtonClick,
 }: PostsProps) => {
   return (
     <div
@@ -51,6 +50,7 @@ const Posts = ({
             {...post}
             onLikeButtonClick={onLikeButtonClick}
             onCommentButtonClick={onCommentButtonClick}
+            onFollowButtonClick={onFollowButtonClick}
           />
         ))}
       </DataLoader>
