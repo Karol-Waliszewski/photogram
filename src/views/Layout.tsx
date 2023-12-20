@@ -9,13 +9,13 @@ import {
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 
+import { useDialog } from "@/components/atoms/Dialog";
 import { Container } from "@/components/atoms/Container";
 import { ScrollArea } from "@/components/atoms/ScrollArea";
 import { Sidebar, type SidebarSection } from "@/components/molecules/Sidebar";
+import { NewPostDialog } from "@/components/organisms/NewPostDialog";
 
 import { cn } from "@/utils/cn";
-import { NewPostDialog } from "@/components/molecules/NewPostDialog";
-import { useDialog } from "@/components/atoms/Dialog";
 
 export type LayoutProps = React.HTMLAttributes<HTMLDivElement>;
 export const Layout = ({

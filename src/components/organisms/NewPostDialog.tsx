@@ -3,6 +3,7 @@ import { type Accept } from "react-dropzone";
 import { Button } from "@/components/atoms/Button";
 import { Image } from "@/components/atoms/Image";
 import { Small, Text } from "@/components/atoms/Typography";
+import { Swiper, SwiperSlide } from "@/components/atoms/Swiper";
 import { AspectRatio } from "@/components/atoms/AspectRatio";
 import { Textarea } from "@/components/atoms/Textarea";
 import { Dropzone } from "@/components/atoms/Dropzone";
@@ -17,6 +18,8 @@ import {
 } from "@/components/atoms/Dialog";
 
 import { cn } from "@/utils/cn";
+import { Trash } from "lucide-react";
+import { useState } from "react";
 
 const ACCEPTED_FILE_TYPES: Accept = {
   "image/jpeg": [".jpg", ".jpeg"],
@@ -33,6 +36,12 @@ const NewPostDialog = ({
   className,
   ...props
 }: NewPostDialogProps) => {
+  const [files, setFiles] = useState<File[]>([]);
+
+  const onImageDeleteClick = (index: number) => {
+    setFiles((files) => files.filter((_, fileIndex) => fileIndex !== index));
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -50,22 +59,47 @@ const NewPostDialog = ({
         <div className="flex flex-col gap-3">
           <AspectRatio
             ratio={1}
-            className="w-full overflow-hidden border border-dashed bg-background p-6 shadow-lg sm:rounded-md"
+            className="w-full overflow-hidden border border-dashed bg-background shadow-lg sm:rounded-md"
           >
             <Dropzone
               accept={ACCEPTED_FILE_TYPES}
-              multiple={false}
-              className=" flex h-full w-full cursor-pointer items-center justify-center "
+              onDrop={(acceptedFiles) => setFiles(acceptedFiles)}
+              noClick={files?.length > 0}
+              multiple
+              className={cn(
+                "flex h-full w-full items-center justify-center",
+                files.length > 0 ? "cursor-default" : "cursor-pointer",
+              )}
             >
-              {({ isDragActive, acceptedTypes, acceptedFiles }) =>
-                acceptedFiles?.length > 0 && acceptedFiles[0] ? (
-                  <Image
-                    src={URL.createObjectURL(acceptedFiles[0])}
-                    alt={""}
-                    cover
-                  />
+              {({ isDragActive, acceptedTypes }) =>
+                files?.length > 0 ? (
+                  <Swiper
+                    className="h-full w-full"
+                    pagination
+                    onClick={(_, e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
+                    {files.map((file, index) => (
+                      <SwiperSlide key={file.name}>
+                        <Image src={URL.createObjectURL(file)} alt={""} cover />
+                        <Button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onImageDeleteClick(index);
+                          }}
+                          className="absolute bottom-2 right-2 z-20"
+                          size="icon"
+                          variant="outline"
+                        >
+                          <Trash className="h-5 w-5" />
+                        </Button>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 p-6 ">
                     <Text className="text-center">
                       {isDragActive
                         ? "Drop your images here"

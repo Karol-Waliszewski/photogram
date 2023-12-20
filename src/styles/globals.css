@@ -61,3 +61,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+.swiper .swiper-horizontal > .swiper-pagination-bullets,
+.swiper .swiper-pagination-bullets.swiper-pagination-horizontal {
+  @apply w-auto;
+  @apply left-1/2;
+  @apply -translate-x-1/2 transform;
+}
