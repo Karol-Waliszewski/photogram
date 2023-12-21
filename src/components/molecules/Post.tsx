@@ -8,7 +8,7 @@ import {
 import { Image } from "@/components/atoms/Image";
 import { AspectRatio } from "@/components/atoms/AspectRatio";
 import { Large, Small, Text } from "@/components/atoms/Typography";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
+import { Avatar } from "@/components/atoms/Avatar";
 
 import { Star, StarOff, MessageCircle } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
@@ -49,15 +49,7 @@ const Post = ({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 py-4">
         <div className="flex flex-row items-center gap-3">
-          <Avatar>
-            <AvatarImage src={createdBy.image} alt={createdBy.name} />
-            <AvatarFallback>
-              {createdBy.name
-                .split(/\s+/)
-                .map((text) => text?.[0] ?? "")
-                .join("")}
-            </AvatarFallback>
-          </Avatar>
+          <Avatar src={createdBy.image} name={createdBy.name} />
           <Large>{createdBy.name}</Large>
         </div>
         {isFollowButtonVisible && (

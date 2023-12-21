@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 
 import { cn } from "@/utils/cn";
 
-const Avatar = forwardRef<
+const AvatarRoot = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
 >(({ className, ...props }, ref) => (
@@ -16,7 +16,7 @@ const Avatar = forwardRef<
     {...props}
   />
 ));
-Avatar.displayName = AvatarPrimitive.Root.displayName;
+AvatarRoot.displayName = AvatarPrimitive.Root.displayName;
 
 const AvatarImage = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
@@ -37,7 +37,7 @@ const AvatarFallback = forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "bg-muted flex h-full w-full items-center justify-center rounded-full",
+      "flex h-full w-full items-center justify-center rounded-full bg-muted",
       className,
     )}
     {...props}
@@ -45,4 +45,27 @@ const AvatarFallback = forwardRef<
 ));
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export { Avatar, AvatarImage, AvatarFallback };
+type AvatarProps = React.ComponentPropsWithoutRef<
+  typeof AvatarPrimitive.Root
+> & {
+  name: string;
+  src: string;
+};
+const Avatar = forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Root>,
+  AvatarProps
+>(({ name, src, ...props }, ref) => (
+  <AvatarRoot {...props} ref={ref}>
+    <AvatarImage src={src} alt={name} />
+    <AvatarFallback>
+      {name
+        .split(/\s+/)
+        .map((text) => text?.[0] ?? "")
+        .join("")
+        .toUpperCase()}
+    </AvatarFallback>
+  </AvatarRoot>
+));
+Avatar.displayName = "Avatar";
+
+export { Avatar, AvatarRoot, AvatarImage, AvatarFallback };
