@@ -77,7 +77,7 @@ const NewPostDialog = ({
                     className="h-full w-full"
                     pagination
                     onClick={(_, e) => {
-                      e.preventDefault();
+                      // e.preventDefault();
                       e.stopPropagation();
                     }}
                   >

@@ -60,9 +60,9 @@ const Avatar = forwardRef<
     <AvatarFallback>
       {name
         ?.split(/\s+/)
-        .map((text) => text?.[0] ?? "")
+        ?.map((text) => text?.[0] ?? "")
         .join("")
-        .toUpperCase()}
+        .toUpperCase() ?? null}
     </AvatarFallback>
   </AvatarRoot>
 ));

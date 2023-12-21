@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/atoms/Avatar";
+import { Avatar } from "@/components/atoms/Avatar";
 import { H1, Large } from "@/components/atoms/Typography";
 
 import { Layout } from "@/views/Layout";

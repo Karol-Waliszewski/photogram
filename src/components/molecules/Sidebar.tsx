@@ -34,7 +34,7 @@ const Sidebar = ({ className, sections, activeHref = null }: SidebarProps) => {
       <div className="space-y-4 py-4">
         <Logo className="px-7 py-4" />
         {sections.map((section, index) => (
-          <div className="px-3 py-2" key={(section?.title ?? "") + index}>
+          <div className="px-3 py-2" key={`${section.title}-${index}`}>
             {section?.title && (
               <Large className="mb-2 px-4">{section.title}</Large>
             )}
@@ -42,7 +42,7 @@ const Sidebar = ({ className, sections, activeHref = null }: SidebarProps) => {
               <div className="space-y-1">
                 {section.items.map((item) =>
                   item.type === "link" ? (
-                    <Link href={item.href}>
+                    <Link key={`${item.label}-${item.href}`} href={item.href}>
                       <Button
                         variant={
                           item.href === activeHref ? "secondary" : "ghost"
