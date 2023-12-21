@@ -13,13 +13,11 @@ const ProfilePage = () => {
       {sessionData?.user && (
         <div className="mt-8 flex flex-row items-center gap-4">
           {sessionData.user.image && (
-            <Avatar className="h-20 w-20">
-              <AvatarImage
-                src={sessionData?.user.image}
-                alt={sessionData?.user.name ?? ""}
-              />
-              <AvatarFallback />
-            </Avatar>
+            <Avatar
+              className="h-20 w-20"
+              src={sessionData?.user.image}
+              name={sessionData?.user.name ?? undefined}
+            />
           )}
           <Large>
             {sessionData.user.name} ({sessionData.user.email})

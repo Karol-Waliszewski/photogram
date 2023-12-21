@@ -48,8 +48,8 @@ AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 type AvatarProps = React.ComponentPropsWithoutRef<
   typeof AvatarPrimitive.Root
 > & {
-  name: string;
   src: string;
+  name?: string;
 };
 const Avatar = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -59,7 +59,7 @@ const Avatar = forwardRef<
     <AvatarImage src={src} alt={name} />
     <AvatarFallback>
       {name
-        .split(/\s+/)
+        ?.split(/\s+/)
         .map((text) => text?.[0] ?? "")
         .join("")
         .toUpperCase()}
