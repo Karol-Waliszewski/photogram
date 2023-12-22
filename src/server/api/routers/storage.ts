@@ -5,7 +5,6 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
   createTRPCRouter,
   protectedProcedure,
-  publicProcedure,
 } from "@/server/api/trpc";
 import { env } from "@/env";
 

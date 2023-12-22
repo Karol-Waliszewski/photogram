@@ -3,9 +3,19 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/utils/cn";
+import { useAtom, type PrimitiveAtom } from "jotai";
 
 const useDialog = (initialOpen = false) => {
   const [isOpen, setOpenState] = useState(initialOpen);
+
+  const open = () => setOpenState(true);
+  const close = () => setOpenState(false);
+
+  return { isOpen, open, close };
+};
+
+const useDialogWithAtom = (atom: PrimitiveAtom<boolean>) => {
+  const [isOpen, setOpenState] = useAtom(atom);
 
   const open = () => setOpenState(true);
   const close = () => setOpenState(false);
@@ -117,6 +127,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   useDialog,
+  useDialogWithAtom,
   Dialog,
   DialogPortal,
   DialogOverlay,
