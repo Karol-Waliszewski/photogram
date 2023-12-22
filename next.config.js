@@ -21,7 +21,7 @@ const config = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.pexels.com",
+        hostname: "kw-photogram.s3.eu-central-1.amazonaws.com",
       },
     ],
   },
