@@ -8,25 +8,25 @@ import { useSession } from "next-auth/react";
 
 const PostPage = () => {
   const { data: sessionData } = useSession();
+  const test = api.useUtils();
   const { data, isFetching, error } = api.post.getPosts.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
-  const { data: followers, refetch: refetchFollowers } =
-    api.user.getFollowings.useQuery(
-      {
-        userId: sessionData?.user.id ?? "",
-      },
-      { enabled: !!sessionData?.user.id, refetchOnWindowFocus: false },
-    );
-  const { mutate: followUser } = api.user.follow.useMutation({
-    onSuccess() {
-      void refetchFollowers();
+  const { data: followers } = api.user.getFollowings.useQuery(
+    {
+      userId: sessionData?.user.id ?? "",
     },
+    { enabled: !!sessionData?.user.id, refetchOnWindowFocus: false },
+  );
+  const invalidateFollowers = () =>
+    test.user.getFollowings.invalidate({
+      userId: sessionData?.user.id,
+    });
+  const { mutate: followUser } = api.user.follow.useMutation({
+    onSuccess: invalidateFollowers,
   });
   const { mutate: unfollowUser } = api.user.unfollow.useMutation({
-    onSuccess() {
-      void refetchFollowers();
-    },
+    onSuccess: invalidateFollowers,
   });
 
   return (
