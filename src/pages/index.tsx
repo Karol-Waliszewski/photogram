@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 const PostPage = () => {
   const { data: sessionData } = useSession();
   const trpc = api.useUtils();
-  const { data, isFetching, error } = api.post.all.useQuery();
+  const { data: posts, isFetching, error } = api.post.all.useQuery();
   const { data: following } = api.user.following.useQuery(
     {
       userId: sessionData?.user.id ?? "",
@@ -44,7 +44,7 @@ const PostPage = () => {
       </Button>
       <Posts
         className="mt-10"
-        posts={data?.map((post) => ({
+        posts={posts?.map((post) => ({
           ...post,
           likes: post.likes.length,
           isFollowButtonVisible:
