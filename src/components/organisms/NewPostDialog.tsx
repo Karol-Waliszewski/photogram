@@ -30,6 +30,7 @@ import {
 } from "@/components/atoms/Form";
 
 import { type TypedOmit } from "@/utils/types";
+import { usePostCreate } from "@/utils/api";
 
 const ACCEPTED_FILE_TYPES: Accept = {
   "image/jpeg": [".jpg", ".jpeg"],
@@ -55,20 +56,24 @@ export type NewPostDialogProps = TypedOmit<
 > & {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: NewPostFormSchema) => Promise<void>;
 };
 const NewPostDialog = ({
   isOpen,
   onClose,
-  onSubmit,
   className,
   ...props
 }: NewPostDialogProps) => {
+  const { createPost } = usePostCreate();
   const [form, onFormSubmit] = useForm({
     schema: FORM_SCHEMA,
     submitHandler: async (data) => {
-      await onSubmit(data);
-      form.reset({ images: [], description: "" });
+      try {
+        await createPost(data);
+        form.reset({ images: [], description: "" });
+        onClose();
+      } catch (error) {
+        console.error(error); // TODO: Add UI error handling
+      }
     },
     options: {
       defaultValues: {

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
@@ -5,6 +6,7 @@ import superjson from "superjson";
 import axios from "axios";
 
 import { type AppRouter } from "@/server/api/root";
+import { type NewPostFormSchema } from "@/components/organisms/NewPostDialog";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
@@ -22,6 +24,46 @@ export const uploadImage = async (image: File, signedUrl: string) => {
   }
 
   return signedUrl.split("?")[0]!;
+};
+
+export const usePostCreate = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const { mutateAsync: savePost } = api.post.create.useMutation();
+  const { mutateAsync: getSignedUrl } = api.storage.getSignedUrl.useMutation();
+  const trpc = api.useUtils();
+
+  const createPost = async (data: NewPostFormSchema) => {
+    try {
+      setIsLoading(true);
+      const images = await Promise.all(
+        data.images.map(async (image) => ({
+          file: image,
+          signedUrl: await getSignedUrl({ key: image.name }),
+        })),
+      );
+
+      const urls = await Promise.all(
+        images.map((image) => {
+          return uploadImage(image.file, image.signedUrl);
+        }),
+      );
+
+      await savePost({
+        description: data.description,
+        images: urls,
+      });
+
+      await trpc.post.invalidate();
+      setIsError(false);
+    } catch (error) {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { createPost, isLoading, isError };
 };
 
 /** A set of type-safe react-query hooks for your tRPC API. */

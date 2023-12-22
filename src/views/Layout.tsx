@@ -13,14 +13,10 @@ import { useDialogWithAtom } from "@/components/atoms/Dialog";
 import { Container } from "@/components/atoms/Container";
 import { ScrollArea } from "@/components/atoms/ScrollArea";
 import { Sidebar, type SidebarSection } from "@/components/molecules/Sidebar";
-import {
-  NewPostDialog,
-  type NewPostFormSchema,
-} from "@/components/organisms/NewPostDialog";
+import { NewPostDialog } from "@/components/organisms/NewPostDialog";
 
 import { isPostDialogOpenAtom } from "@/store";
 
-import { api, uploadImage } from "@/utils/api";
 import { cn } from "@/utils/cn";
 
 export type LayoutProps = React.HTMLAttributes<HTMLDivElement>;
@@ -31,31 +27,6 @@ export const Layout = ({
 }: PropsWithChildren<LayoutProps>) => {
   const { status } = useSession();
   const { isOpen, open, close } = useDialogWithAtom(isPostDialogOpenAtom);
-  const { mutateAsync: createPost } = api.post.create.useMutation();
-  const { mutateAsync: getSignedUrl } = api.storage.getSignedUrl.useMutation();
-  const trpc = api.useUtils();
-
-  const onFormSubmit = async (data: NewPostFormSchema) => {
-    const images = await Promise.all(
-      data.images.map(async (image) => ({
-        file: image,
-        signedUrl: await getSignedUrl({ key: image.name }),
-      })),
-    );
-
-    const urls = await Promise.all(
-      images.map((image) => {
-        return uploadImage(image.file, image.signedUrl);
-      }),
-    );
-
-    await createPost({
-      description: data.description,
-      images: urls,
-    });
-
-    await trpc.post.invalidate();
-  };
 
   const sidebarLinks = useMemo<SidebarSection[]>(
     () =>
@@ -123,7 +94,7 @@ export const Layout = ({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <NewPostDialog isOpen={isOpen} onClose={close} onSubmit={onFormSubmit} />
+      <NewPostDialog isOpen={isOpen} onClose={close} />
       <Sidebar sections={sidebarLinks} className="w-1/3 max-w-[250px]" />
       <ScrollArea className="max-h-screen w-full overflow-auto">
         <Container
