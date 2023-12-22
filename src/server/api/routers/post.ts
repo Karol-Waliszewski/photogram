@@ -8,7 +8,12 @@ import {
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ description: z.string(), images: z.array(z.string()) }))
+    .input(
+      z.object({
+        description: z.string(),
+        images: z.array(z.string()),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.post.create({
         data: {
@@ -76,7 +81,10 @@ export const postRouter = createTRPCRouter({
   comments: publicProcedure
     .input(z.object({ postId: z.number() }))
     .query(({ ctx, input }) => {
-      return ctx.db.comment.findMany({ where: { postId: input.postId } , include: { createdBy: true }});
+      return ctx.db.comment.findMany({
+        where: { postId: input.postId },
+        include: { createdBy: true },
+      });
     }),
 
   comment: protectedProcedure
