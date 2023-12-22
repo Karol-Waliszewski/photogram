@@ -41,49 +41,7 @@ export const userRouter = createTRPCRouter({
       ]);
     }),
 
-  like: protectedProcedure
-    .input(z.object({ postId: z.number() }))
-    .mutation(({ ctx, input }) => {
-      return ctx.db.$transaction([
-        ctx.db.user.update({
-          where: { id: ctx.session.user.id },
-          data: { liked: { connect: { id: input.postId } } },
-        }),
-        ctx.db.post.update({
-          where: { id: input.postId },
-          data: { likes: { connect: { id: ctx.session.user.id } } },
-        }),
-      ]);
-    }),
-
-  unlike: protectedProcedure
-    .input(z.object({ postId: z.number() }))
-    .mutation(({ ctx, input }) => {
-      return ctx.db.$transaction([
-        ctx.db.user.update({
-          where: { id: ctx.session.user.id },
-          data: { liked: { disconnect: { id: input.postId } } },
-        }),
-        ctx.db.post.update({
-          where: { id: input.postId },
-          data: { likes: { disconnect: { id: ctx.session.user.id } } },
-        }),
-      ]);
-    }),
-
-  comment: protectedProcedure
-    .input(z.object({ postId: z.number(), comment: z.string() }))
-    .mutation(({ ctx, input }) => {
-      return ctx.db.comment.create({
-        data: {
-          content: input.comment,
-          createdBy: { connect: { id: ctx.session.user.id } },
-          post: { connect: { id: input.postId } },
-        },
-      });
-    }),
-
-  getFollowers: publicProcedure
+  followers: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.db.user
@@ -91,7 +49,7 @@ export const userRouter = createTRPCRouter({
         .followers();
     }),
 
-  getFollowings: publicProcedure
+  following: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.db.user

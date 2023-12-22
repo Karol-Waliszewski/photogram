@@ -32,7 +32,7 @@ export const postRouter = createTRPCRouter({
       });
     }),
 
-  getPosts: publicProcedure.query(({ ctx }) => {
+  all: publicProcedure.query(({ ctx }) => {
     return ctx.db.post.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -43,16 +43,21 @@ export const postRouter = createTRPCRouter({
     });
   }),
 
-  getPostsByUser: publicProcedure
+  byUserId: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.db.post.findMany({
         orderBy: { createdAt: "desc" },
+        include: {
+          images: true,
+          createdBy: true,
+          likes: true,
+        },
         where: { createdBy: { id: input.userId } },
       });
     }),
 
-  getPostsFromFollowedUsers: protectedProcedure.query(({ ctx }) => {
+  fromFollowedUsers: protectedProcedure.query(({ ctx }) => {
     return ctx.db.post.findMany({
       orderBy: { createdAt: "desc" },
       include: { images: true, createdBy: true, likes: true },
@@ -68,9 +73,51 @@ export const postRouter = createTRPCRouter({
     });
   }),
 
-  getComments: publicProcedure
+  comments: publicProcedure
     .input(z.object({ postId: z.number() }))
     .query(({ ctx, input }) => {
-      return ctx.db.comment.findMany({ where: { postId: input.postId } });
+      return ctx.db.comment.findMany({ where: { postId: input.postId } , include: { createdBy: true }});
+    }),
+
+  comment: protectedProcedure
+    .input(z.object({ postId: z.number(), comment: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.db.comment.create({
+        data: {
+          content: input.comment,
+          createdBy: { connect: { id: ctx.session.user.id } },
+          post: { connect: { id: input.postId } },
+        },
+      });
+    }),
+
+  like: protectedProcedure
+    .input(z.object({ postId: z.number() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.db.$transaction([
+        ctx.db.user.update({
+          where: { id: ctx.session.user.id },
+          data: { liked: { connect: { id: input.postId } } },
+        }),
+        ctx.db.post.update({
+          where: { id: input.postId },
+          data: { likes: { connect: { id: ctx.session.user.id } } },
+        }),
+      ]);
+    }),
+
+  unlike: protectedProcedure
+    .input(z.object({ postId: z.number() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.db.$transaction([
+        ctx.db.user.update({
+          where: { id: ctx.session.user.id },
+          data: { liked: { disconnect: { id: input.postId } } },
+        }),
+        ctx.db.post.update({
+          where: { id: input.postId },
+          data: { likes: { disconnect: { id: ctx.session.user.id } } },
+        }),
+      ]);
     }),
 });

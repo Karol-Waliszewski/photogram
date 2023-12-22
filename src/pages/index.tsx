@@ -8,18 +8,16 @@ import { useSession } from "next-auth/react";
 
 const PostPage = () => {
   const { data: sessionData } = useSession();
-  const test = api.useUtils();
-  const { data, isFetching, error } = api.post.getPosts.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
-  const { data: followers } = api.user.getFollowings.useQuery(
+  const trpc = api.useUtils();
+  const { data, isFetching, error } = api.post.all.useQuery();
+  const { data: following } = api.user.following.useQuery(
     {
       userId: sessionData?.user.id ?? "",
     },
-    { enabled: !!sessionData?.user.id, refetchOnWindowFocus: false },
+    { enabled: !!sessionData?.user.id },
   );
   const invalidateFollowers = () =>
-    test.user.getFollowings.invalidate({
+    trpc.user.following.invalidate({
       userId: sessionData?.user.id,
     });
   const { mutate: followUser } = api.user.follow.useMutation({
@@ -54,8 +52,8 @@ const PostPage = () => {
           isFavourite: sessionData?.user
             ? post.likes.some((like) => like.id === sessionData?.user.id)
             : false,
-          isAuthorFollowed: followers?.some(
-            (follower) => follower.id === post.createdById,
+          isAuthorFollowed: following?.some(
+            (user) => user.id === post.createdById,
           ),
         }))}
         loading={isFetching}

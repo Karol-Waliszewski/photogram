@@ -22,6 +22,19 @@ export const api = createTRPCNext<AppRouter>({
   config() {
     return {
       /**
+       * Config for react-query.
+       *
+       * @see https://tanstack.com/query/v4/docs/react/reference/QueryClient
+       */
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+          },
+        },
+      },
+
+      /**
        * Transformer used for data de-serialization from the server.
        *
        * @see https://trpc.io/docs/data-transformers
