@@ -10,7 +10,7 @@ import { AspectRatio } from "@/components/atoms/AspectRatio";
 import { Large, Small, Text } from "@/components/atoms/Typography";
 import { Avatar } from "@/components/atoms/Avatar";
 
-import { Star, StarOff, MessageCircle } from "lucide-react";
+import { Star, StarOff, MessageCircle, Trash } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 import { Tooltip } from "@/components/atoms/Tooltip";
 
@@ -25,10 +25,12 @@ export type PostProps = {
   images: { id: number; src: string; alt: string }[];
   likes: number;
   isFavourite?: boolean;
+  isAuthor?: boolean;
   isAuthorFollowed?: boolean;
   isFollowButtonVisible?: boolean;
   onLikeButtonClick?: (postId: number) => void;
   onCommentButtonClick?: (postId: number) => void;
+  onDeleteButtonClick?: (postId: number) => void;
   onFollowButtonClick?: (userId: string, isFollowed: boolean) => void;
 };
 
@@ -40,9 +42,11 @@ const Post = ({
   likes,
   isFavourite = false,
   isFollowButtonVisible = false,
+  isAuthor = false,
   isAuthorFollowed = false,
   onLikeButtonClick,
   onCommentButtonClick,
+  onDeleteButtonClick,
   onFollowButtonClick,
 }: PostProps) => {
   return (
@@ -80,28 +84,43 @@ const Post = ({
       </CardContent>
       <CardFooter className="flex flex-col items-start pb-4 pt-3">
         <div className="-ml-2 flex flex-row gap-1">
-          <Tooltip text={isFavourite ? "Unlike" : "Like"}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onLikeButtonClick?.(id)}
-            >
-              {isFavourite ? (
-                <StarOff className="h-6 w-6" />
-              ) : (
-                <Star className="h-6 w-6" />
-              )}
-            </Button>
-          </Tooltip>
-          <Tooltip text={"Comments"}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onCommentButtonClick?.(id)}
-            >
-              <MessageCircle className="h-6 w-6" />
-            </Button>
-          </Tooltip>
+          {onLikeButtonClick && (
+            <Tooltip text={isFavourite ? "Unlike post" : "Like post"}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onLikeButtonClick(id)}
+              >
+                {isFavourite ? (
+                  <StarOff className="h-6 w-6" />
+                ) : (
+                  <Star className="h-6 w-6" />
+                )}
+              </Button>
+            </Tooltip>
+          )}
+          {onCommentButtonClick && (
+            <Tooltip text={"Comments"}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onCommentButtonClick(id)}
+              >
+                <MessageCircle className="h-6 w-6" />
+              </Button>
+            </Tooltip>
+          )}
+          {isAuthor && onDeleteButtonClick && (
+            <Tooltip text={"Delete post"}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDeleteButtonClick(id)}
+              >
+                <Trash className="h-6 w-6" />
+              </Button>
+            </Tooltip>
+          )}
         </div>
         <div className="pb-2">
           <Small>
