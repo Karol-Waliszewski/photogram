@@ -14,7 +14,7 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
-export const uploadImage = async (image: File, signedUrl: string) => {
+const uploadImage = async (image: File, signedUrl: string) => {
   const response = await axios.put(signedUrl, image.slice(), {
     headers: { "Content-Type": image.type },
   });
@@ -36,16 +36,11 @@ export const usePostCreate = () => {
   const createPost = async (data: NewPostFormSchema) => {
     try {
       setIsLoading(true);
-      const images = await Promise.all(
-        data.images.map(async (image) => ({
-          file: image,
-          signedUrl: await getSignedUrl({ key: image.name }),
-        })),
-      );
 
       const urls = await Promise.all(
-        images.map((image) => {
-          return uploadImage(image.file, image.signedUrl);
+        data.images.map(async (image) => {
+          const signedUrl = await getSignedUrl({ key: image.name });
+          return uploadImage(image, signedUrl);
         }),
       );
 
@@ -57,6 +52,7 @@ export const usePostCreate = () => {
       await trpc.post.invalidate();
       setIsError(false);
     } catch (error) {
+      console.error(error);
       setIsError(true);
     } finally {
       setIsLoading(false);
