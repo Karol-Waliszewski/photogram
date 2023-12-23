@@ -2,10 +2,7 @@ import { z } from "zod";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { env } from "@/env";
 
 export const storageRouter = createTRPCRouter({
@@ -20,6 +17,6 @@ export const storageRouter = createTRPCRouter({
         Key: key,
       });
 
-      return await getSignedUrl(s3, putObjectCommand);
+      return getSignedUrl(s3, putObjectCommand);
     }),
 });
