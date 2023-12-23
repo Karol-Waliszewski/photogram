@@ -171,6 +171,7 @@ const NewPostDialog = ({
                                       e.preventDefault();
                                       onImageDeleteClick(field.value, index);
                                     }}
+                                    disabled={form.isSubmitting}
                                     className="absolute bottom-2 right-2 z-20"
                                     size="icon"
                                     variant="outline"
