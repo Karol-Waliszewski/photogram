@@ -11,6 +11,7 @@ import { Swiper, SwiperSlide } from "@/components/atoms/Swiper";
 import { AspectRatio } from "@/components/atoms/AspectRatio";
 import { Textarea } from "@/components/atoms/Textarea";
 import { Dropzone } from "@/components/atoms/Dropzone";
+import { useToast } from "@/components/atoms/Toast";
 import {
   Dialog,
   DialogClose,
@@ -49,6 +50,16 @@ const FORM_SCHEMA = z.object({
   images: z.array(z.instanceof(File)).min(1, IMAGES_ERROR_MESSAGE),
 });
 
+const SUCCESS_TOAST = {
+  title: "Hurray! You did it!",
+  description: "Your post has been created successfully",
+};
+
+const ERROR_TOAST = {
+  title: "Uh.. Oh no...",
+  description: "Something went wrong while adding your post",
+};
+
 export type NewPostFormSchema = z.infer<typeof FORM_SCHEMA>;
 export type NewPostDialogProps = TypedOmit<
   React.ComponentProps<typeof DialogContent>,
@@ -64,15 +75,18 @@ const NewPostDialog = ({
   ...props
 }: NewPostDialogProps) => {
   const { createPost } = usePostCreate();
+  const { toast } = useToast();
   const [form, onFormSubmit] = useForm({
     schema: FORM_SCHEMA,
     submitHandler: async (data) => {
       try {
         await createPost(data);
         form.reset({ images: [], description: "" });
+        toast(SUCCESS_TOAST);
         onClose();
       } catch (error) {
-        console.error(error); // TODO: Add UI error handling
+        console.error(error);
+        toast(ERROR_TOAST);
       }
     },
     options: {
