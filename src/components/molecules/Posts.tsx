@@ -21,6 +21,7 @@ const Posts = ({
   onLikeButtonClick,
   onCommentButtonClick,
   onFollowButtonClick,
+  onDeleteButtonClick,
 }: PostsProps) => {
   return (
     <div
@@ -51,6 +52,7 @@ const Posts = ({
             onLikeButtonClick={onLikeButtonClick}
             onCommentButtonClick={onCommentButtonClick}
             onFollowButtonClick={onFollowButtonClick}
+            onDeleteButtonClick={onDeleteButtonClick}
           />
         ))}
       </DataLoader>
