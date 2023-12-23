@@ -8,6 +8,7 @@ import {
   PlusSquare,
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import { useDialogWithAtom } from "@/components/atoms/Dialog";
 import { Container } from "@/components/atoms/Container";
@@ -15,9 +16,14 @@ import { ScrollArea } from "@/components/atoms/ScrollArea";
 import { Sidebar, type SidebarSection } from "@/components/molecules/Sidebar";
 import { NewPostDialog } from "@/components/organisms/NewPostDialog";
 
-import { isPostDialogOpenAtom } from "@/store";
+import {
+  isPostCreateDialogOpenAtom,
+  isPostDeleteDialogOpenAtom,
+  postToBeDeletedIdAtom,
+} from "@/store";
 
 import { cn } from "@/utils/cn";
+import { DeletePostDialog } from "@/components/organisms/DeletePostDialog";
 
 export type LayoutProps = React.HTMLAttributes<HTMLDivElement>;
 export const Layout = ({
@@ -26,7 +32,13 @@ export const Layout = ({
   ...props
 }: PropsWithChildren<LayoutProps>) => {
   const { status } = useSession();
-  const { isOpen, open, close } = useDialogWithAtom(isPostDialogOpenAtom);
+  const {
+    isOpen: isPostCreateDialogOpen,
+    open,
+    close,
+  } = useDialogWithAtom(isPostCreateDialogOpenAtom);
+  const isPostDeleteDialogOpen = useAtomValue(isPostDeleteDialogOpenAtom);
+  const setPostToBeDeletedId = useSetAtom(postToBeDeletedIdAtom);
 
   const sidebarLinks = useMemo<SidebarSection[]>(
     () =>
@@ -94,7 +106,11 @@ export const Layout = ({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <NewPostDialog isOpen={isOpen} onClose={close} />
+      <NewPostDialog isOpen={isPostCreateDialogOpen} onClose={close} />
+      <DeletePostDialog
+        isOpen={isPostDeleteDialogOpen}
+        onClose={() => setPostToBeDeletedId(null)}
+      />
       <Sidebar sections={sidebarLinks} className="w-1/3 max-w-[250px]" />
       <ScrollArea className="max-h-screen w-full overflow-auto">
         <Container
