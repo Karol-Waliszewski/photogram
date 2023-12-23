@@ -1,5 +1,7 @@
 import { Button } from "@/components/atoms/Button";
 import { H1, Text } from "@/components/atoms/Typography";
+import { useToast } from "@/components/atoms/Toast";
+
 import { Posts } from "@/components/molecules/Posts";
 import { Layout } from "@/views/Layout";
 
@@ -9,17 +11,36 @@ import { useSession } from "next-auth/react";
 const PostPage = () => {
   const { data: sessionData } = useSession();
   const trpc = api.useUtils();
+  const { toast } = useToast();
+  const invalidatePosts = () => trpc.post.all.invalidate();
+  const invalidateFollowers = () =>
+    trpc.user.following.invalidate({
+      userId: sessionData?.user.id,
+    });
+
   const { data: posts, isFetching, error } = api.post.all.useQuery();
+  const { mutate: deletePost } = api.post.delete.useMutation({
+    onSuccess: () => {
+      void invalidatePosts();
+      toast({
+        title: "Say bye bye!",
+        description: "You successfully deleted a post.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Oh noooooo...",
+        description: "Something went wrong while deleting your post.",
+      });
+    },
+  });
   const { data: following } = api.user.following.useQuery(
     {
       userId: sessionData?.user.id ?? "",
     },
     { enabled: !!sessionData?.user.id },
   );
-  const invalidateFollowers = () =>
-    trpc.user.following.invalidate({
-      userId: sessionData?.user.id,
-    });
+
   const { mutate: followUser } = api.user.follow.useMutation({
     onSuccess: invalidateFollowers,
   });
@@ -52,6 +73,8 @@ const PostPage = () => {
           isFavourite: sessionData?.user
             ? post.likes.some((like) => like.id === sessionData?.user.id)
             : false,
+          isAuthor:
+            sessionData?.user && post.createdById === sessionData?.user.id,
           isAuthorFollowed: following?.some(
             (user) => user.id === post.createdById,
           ),
@@ -67,6 +90,9 @@ const PostPage = () => {
         onFollowButtonClick={(userId, isFollowed) =>
           isFollowed ? unfollowUser({ userId }) : followUser({ userId })
         }
+        onDeleteButtonClick={(postId) => {
+          deletePost({ postId });
+        }}
       />
     </Layout>
   );

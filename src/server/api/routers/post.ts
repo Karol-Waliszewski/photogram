@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { env } from "@/env";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -32,8 +32,73 @@ export const postRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ postId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.post.delete({
-        where: { id: input.postId },
+      return await ctx.db.$transaction(async (prisma) => {
+        // Check if the post exists and if the user is the creator of the post
+        await prisma.post.findUniqueOrThrow({
+          where: {
+            id: input.postId,
+            createdById: ctx.session.user.id,
+          },
+        });
+
+        // Fetch all image URLs associated with the post
+        const postImageUrls = await prisma.image
+          .findMany({
+            where: {
+              postId: input.postId,
+            },
+            select: {
+              src: true,
+            },
+          })
+          .then((images) => images.map((image) => image.src));
+
+        // Fetch all image URLs that are duplicates of the post's image URLs
+        const duplicateImageUrls = await prisma.image
+          .findMany({
+            where: {
+              src: {
+                in: postImageUrls,
+              },
+              NOT: {
+                postId: input.postId,
+              },
+            },
+            select: {
+              src: true,
+            },
+          })
+          .then((images) => images.map((image) => image.src));
+
+        // Filter out post image URLs that are duplicates
+        const uniquePostImageUrls = postImageUrls.filter(
+          (url) => !duplicateImageUrls.includes(url),
+        );
+
+        await Promise.all([
+          prisma.image.deleteMany({
+            where: { postId: input.postId },
+          }),
+          prisma.comment.deleteMany({
+            where: { postId: input.postId },
+          }),
+        ]);
+
+        await prisma.post.delete({
+          where: { id: input.postId },
+        });
+
+        // Delete images from S3
+        if (uniquePostImageUrls.length > 0)
+          await ctx.s3.deleteObjects({
+            Bucket: env.AWS_BUCKET_NAME,
+            Delete: {
+              Objects: uniquePostImageUrls.map((url) => ({
+                // Example of image url: https://kw-photogram.s3.eu-central-1.amazonaws.com/398310840_1416191592614860_5892750325849203067_n.jpg
+                Key: url.split("amazonaws.com/")[1]!,
+              })),
+            },
+          });
       });
     }),
 
