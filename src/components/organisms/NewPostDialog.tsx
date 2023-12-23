@@ -1,6 +1,6 @@
 import { type Accept } from "react-dropzone";
 import { cn } from "@/utils/cn";
-import { Trash } from "lucide-react";
+import { Loader2, Trash } from "lucide-react";
 import { useEffect } from "react";
 import { z } from "zod";
 
@@ -11,6 +11,7 @@ import { Swiper, SwiperSlide } from "@/components/atoms/Swiper";
 import { AspectRatio } from "@/components/atoms/AspectRatio";
 import { Textarea } from "@/components/atoms/Textarea";
 import { Dropzone } from "@/components/atoms/Dropzone";
+import { useToast } from "@/components/atoms/Toast";
 import {
   Dialog,
   DialogClose,
@@ -29,6 +30,9 @@ import {
   useForm,
 } from "@/components/atoms/Form";
 
+import { type TypedOmit } from "@/utils/types";
+import { usePostCreate } from "@/utils/api";
+
 const ACCEPTED_FILE_TYPES: Accept = {
   "image/jpeg": [".jpg", ".jpeg"],
   "image/png": [".png"],
@@ -37,7 +41,30 @@ const ACCEPTED_FILE_TYPES: Accept = {
 const DESCRIPTION_ERROR_MESSAGE = "Description is required";
 const IMAGES_ERROR_MESSAGE = "At least one image is required";
 
-export type NewPostDialogProps = React.ComponentProps<typeof DialogContent> & {
+const FORM_SCHEMA = z.object({
+  description: z
+    .string({
+      required_error: DESCRIPTION_ERROR_MESSAGE,
+    })
+    .min(1, DESCRIPTION_ERROR_MESSAGE),
+  images: z.array(z.instanceof(File)).min(1, IMAGES_ERROR_MESSAGE),
+});
+
+const SUCCESS_TOAST = {
+  title: "Hurray! You did it!",
+  description: "Your post has been created successfully",
+};
+
+const ERROR_TOAST = {
+  title: "Uh.. Oh no...",
+  description: "Something went wrong while adding your post",
+};
+
+export type NewPostFormSchema = z.infer<typeof FORM_SCHEMA>;
+export type NewPostDialogProps = TypedOmit<
+  React.ComponentProps<typeof DialogContent>,
+  "onSubmit"
+> & {
   isOpen: boolean;
   onClose: () => void;
 };
@@ -47,17 +74,20 @@ const NewPostDialog = ({
   className,
   ...props
 }: NewPostDialogProps) => {
+  const { createPost } = usePostCreate();
+  const { toast } = useToast();
   const [form, onFormSubmit] = useForm({
-    schema: z.object({
-      description: z
-        .string({
-          required_error: DESCRIPTION_ERROR_MESSAGE,
-        })
-        .min(1, DESCRIPTION_ERROR_MESSAGE),
-      images: z.array(z.instanceof(File)).min(1, IMAGES_ERROR_MESSAGE),
-    }),
+    schema: FORM_SCHEMA,
     submitHandler: async (data) => {
-      console.log(data);
+      try {
+        await createPost(data);
+        form.reset({ images: [], description: "" });
+        toast(SUCCESS_TOAST);
+        onClose();
+      } catch (error) {
+        console.error(error);
+        toast(ERROR_TOAST);
+      }
     },
     options: {
       defaultValues: {
@@ -141,6 +171,7 @@ const NewPostDialog = ({
                                       e.preventDefault();
                                       onImageDeleteClick(field.value, index);
                                     }}
+                                    disabled={form.isSubmitting}
                                     className="absolute bottom-2 right-2 z-20"
                                     size="icon"
                                     variant="outline"
@@ -189,8 +220,14 @@ const NewPostDialog = ({
           </form>
         </Form>
         <DialogFooter className="sm:justify-start">
-          <Button type="submit" onClick={onFormSubmit}>
-            Add post
+          <Button
+            type="submit"
+            onClick={onFormSubmit}
+            disabled={form.isSubmitting}
+            className="flex items-center gap-1"
+          >
+            {form.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {form.isSubmitting ? "Adding" : "Add post"}
           </Button>
           <DialogClose asChild>
             <Button type="button" variant="secondary">

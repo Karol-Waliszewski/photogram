@@ -1,20 +1,65 @@
-/**
- * This is the client-side entrypoint for your tRPC API. It is used to create the `api` object which
- * contains the Next.js App-wrapper, as well as your type-safe React Query hooks.
- *
- * We also create a few inference helpers for input and output types.
- */
+import { useState } from "react";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
+import axios from "axios";
 
 import { type AppRouter } from "@/server/api/root";
+import { type NewPostFormSchema } from "@/components/organisms/NewPostDialog";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+};
+
+const uploadImage = async (image: File, signedUrl: string) => {
+  const response = await axios.put(signedUrl, image.slice(), {
+    headers: { "Content-Type": image.type },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Failed to upload image");
+  }
+
+  return signedUrl.split("?")[0]!;
+};
+
+export const usePostCreate = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const { mutateAsync: savePost } = api.post.create.useMutation();
+  const { mutateAsync: getSignedUrl } = api.storage.getSignedUrl.useMutation();
+  const trpc = api.useUtils();
+
+  const createPost = async (data: NewPostFormSchema) => {
+    try {
+      setIsLoading(true);
+
+      const urls = await Promise.all(
+        data.images.map(async (image) => {
+          const signedUrl = await getSignedUrl({ key: image.name });
+          return uploadImage(image, signedUrl);
+        }),
+      );
+
+      await savePost({
+        description: data.description,
+        images: urls,
+      });
+
+      await trpc.post.invalidate();
+      setIsError(false);
+    } catch (error) {
+      console.error(error);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { createPost, isLoading, isError };
 };
 
 /** A set of type-safe react-query hooks for your tRPC API. */

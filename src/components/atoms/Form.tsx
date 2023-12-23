@@ -1,4 +1,4 @@
-import { createContext, useContext, useId, forwardRef } from "react";
+import { createContext, useContext, useId, forwardRef, useState } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import {
   useForm as useReactHookForm,
@@ -31,13 +31,18 @@ const useForm = <T extends z.AnyZodObject>({
   submitHandler,
   options = {},
 }: UseFormArgs<T>) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useReactHookForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     mode: "onTouched",
     ...options,
   });
-  const onFormSubmit = form.handleSubmit((data) => submitHandler(data));
-  return [form, onFormSubmit] as const;
+  const onFormSubmit = form.handleSubmit(async (data) => {
+    setIsSubmitting(true);
+    await submitHandler(data);
+    setIsSubmitting(false);
+  });
+  return [{ ...form, isSubmitting }, onFormSubmit] as const;
 };
 
 type FormFieldContextValue<

@@ -6,6 +6,7 @@ import {
   type ClientSafeProvider,
   type LiteralUnion,
   getProviders,
+  signIn,
 } from "next-auth/react";
 import { type BuiltInProviderType } from "next-auth/providers/index";
 
@@ -13,7 +14,7 @@ import { H3, Muted, Small, Text } from "@/components/atoms/Typography";
 
 import { Logo } from "@/components/molecules/Logo";
 
-import { UserAuthForm } from "@/components/organisms/AuthForm";
+import { UserAuthForm } from "@/components/molecules/AuthForm";
 
 import { values } from "@/utils/object";
 import { getServerAuthSession } from "@/server/auth";
@@ -49,7 +50,10 @@ const SignInPage = ({
             </div>
           </div>
 
-          <UserAuthForm providers={values(providers)} />
+          <UserAuthForm
+            providers={values(providers)}
+            onProviderClick={(provider) => signIn(provider.id)}
+          />
 
           {/* TODO: Print auth error messages */}
         </div>

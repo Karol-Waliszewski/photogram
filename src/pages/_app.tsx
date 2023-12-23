@@ -1,12 +1,15 @@
-import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { type AppType } from "next/app";
 import { Inter as FontSans } from "next/font/google";
+import { Provider as StoreProvider } from "jotai";
+import { type Session } from "next-auth";
+import { type AppType } from "next/app";
+
+import { Toaster } from "@/components/organisms/Toaster";
 
 import { api } from "@/utils/api";
+import { cn } from "@/utils/cn";
 
 import "@/styles/globals.css";
-import { cn } from "@/utils/cn";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -40,9 +43,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
       `}</style>
       <SessionProvider session={session}>
-        <div className={cn("font-sans", fontSans.variable)}>
-          <Component {...pageProps} />
-        </div>
+        <StoreProvider>
+          <div className={cn("font-sans", fontSans.variable)}>
+            <Component {...pageProps} />
+            <Toaster />
+          </div>
+        </StoreProvider>
       </SessionProvider>
     </>
   );
