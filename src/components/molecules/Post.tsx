@@ -24,11 +24,11 @@ export type PostProps = {
   };
   images: { id: number; src: string; alt: string }[];
   likes: number;
-  isFavourite?: boolean;
+  isLiked?: boolean;
   isAuthor?: boolean;
   isAuthorFollowed?: boolean;
   isFollowButtonVisible?: boolean;
-  onLikeButtonClick?: (postId: number) => void;
+  onLikeButtonClick?: (postId: number, isLiked: boolean) => void;
   onCommentButtonClick?: (postId: number) => void;
   onDeleteButtonClick?: (postId: number) => void;
   onFollowButtonClick?: (userId: string, isFollowed: boolean) => void;
@@ -40,7 +40,7 @@ const Post = ({
   images,
   createdBy,
   likes,
-  isFavourite = false,
+  isLiked = false,
   isFollowButtonVisible = false,
   isAuthor = false,
   isAuthorFollowed = false,
@@ -85,13 +85,13 @@ const Post = ({
       <CardFooter className="flex flex-col items-start pb-4 pt-3">
         <div className="-ml-2 flex flex-row gap-1">
           {onLikeButtonClick && (
-            <Tooltip text={isFavourite ? "Unlike post" : "Like post"}>
+            <Tooltip text={isLiked ? "Unlike post" : "Like post"}>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onLikeButtonClick(id)}
+                onClick={() => onLikeButtonClick(id, isLiked)}
               >
-                {isFavourite ? (
+                {isLiked ? (
                   <StarOff className="h-6 w-6" />
                 ) : (
                   <Star className="h-6 w-6" />

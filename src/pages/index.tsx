@@ -17,7 +17,14 @@ const PostPage = () => {
     trpc.user.following.invalidate({
       userId: sessionData?.user.id,
     });
-  const { data: posts, isFetching, error } = api.post.all.useQuery();
+  const invalidatePost = () => trpc.post.all.invalidate();
+
+  const {
+    data: posts,
+    isFetching,
+    error,
+    isRefetching,
+  } = api.post.all.useQuery();
   const { data: following } = api.user.following.useQuery(
     {
       userId: sessionData?.user.id ?? "",
@@ -30,6 +37,13 @@ const PostPage = () => {
   });
   const { mutate: unfollowUser } = api.user.unfollow.useMutation({
     onSuccess: invalidateFollowers,
+  });
+
+  const { mutate: likePost } = api.post.like.useMutation({
+    onSuccess: invalidatePost,
+  });
+  const { mutate: unlikePost } = api.post.unlike.useMutation({
+    onSuccess: invalidatePost,
   });
 
   return (
@@ -54,7 +68,7 @@ const PostPage = () => {
           likes: post.likes.length,
           isFollowButtonVisible:
             sessionData?.user && post.createdById !== sessionData?.user.id,
-          isFavourite: sessionData?.user
+          isLiked: sessionData?.user
             ? post.likes.some((like) => like.id === sessionData?.user.id)
             : false,
           isAuthor:
@@ -63,13 +77,10 @@ const PostPage = () => {
             (user) => user.id === post.createdById,
           ),
         }))}
-        loading={isFetching}
+        loading={isFetching && !isRefetching}
         error={error?.message}
-        onLikeButtonClick={(postId) => {
-          alert(postId);
-        }}
-        onCommentButtonClick={(postId) => {
-          alert(postId);
+        onLikeButtonClick={(postId, isLiked) => {
+          isLiked ? unlikePost({ postId }) : likePost({ postId });
         }}
         onFollowButtonClick={(userId, isFollowed) =>
           isFollowed ? unfollowUser({ userId }) : followUser({ userId })

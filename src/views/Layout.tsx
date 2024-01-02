@@ -15,6 +15,7 @@ import { Container } from "@/components/atoms/Container";
 import { ScrollArea } from "@/components/atoms/ScrollArea";
 import { Sidebar, type SidebarSection } from "@/components/molecules/Sidebar";
 import { NewPostDialog } from "@/components/organisms/NewPostDialog";
+import { DeletePostDialog } from "@/components/organisms/DeletePostDialog";
 
 import {
   isPostCreateDialogOpenAtom,
@@ -23,7 +24,6 @@ import {
 } from "@/store";
 
 import { cn } from "@/utils/cn";
-import { DeletePostDialog } from "@/components/organisms/DeletePostDialog";
 
 export type LayoutProps = React.HTMLAttributes<HTMLDivElement>;
 export const Layout = ({
