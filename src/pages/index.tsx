@@ -17,7 +17,7 @@ const PostPage = () => {
     trpc.user.following.invalidate({
       userId: sessionData?.user.id,
     });
-  const invalidatePost = () => trpc.post.all.invalidate();
+  const invalidatePosts = () => trpc.post.all.invalidate();
 
   const {
     data: posts,
@@ -40,10 +40,10 @@ const PostPage = () => {
   });
 
   const { mutate: likePost } = api.post.like.useMutation({
-    onSuccess: invalidatePost,
+    onSuccess: invalidatePosts,
   });
   const { mutate: unlikePost } = api.post.unlike.useMutation({
-    onSuccess: invalidatePost,
+    onSuccess: invalidatePosts,
   });
 
   return (
