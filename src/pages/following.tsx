@@ -7,12 +7,13 @@ import { Layout } from "@/views/Layout";
 
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
-import { postToBeDeletedIdAtom } from "@/store";
+import { isPostCreateDialogOpenAtom, postToBeDeletedIdAtom } from "@/store";
 
 const FollowingPage = () => {
   const { data: sessionData } = useSession();
   const trpc = api.useUtils();
   const setPostToBeDeletedId = useSetAtom(postToBeDeletedIdAtom);
+  const setPostCreateDialogVisibility = useSetAtom(isPostCreateDialogOpenAtom);
   const invalidateFollowers = () =>
     trpc.user.following.invalidate({
       userId: sessionData?.user.id,
@@ -56,16 +57,17 @@ const FollowingPage = () => {
     <Layout className="pt-10">
       <H1>Following Page</H1>
       <Text>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores
-        deleniti ducimus modi voluptatem eos dignissimos fugiat saepe fugit
-        accusantium cum, odio atque soluta provident iure quasi quod.
-        Repudiandae, quis quibusdam. Lorem ipsum dolor, sit amet consectetur
-        adipisicing elit. Perspiciatis ab quas id porro a fugit corporis,
-        repudiandae quos omnis dolorem eligendi aut unde? Doloremque, voluptatum
-        aliquid at autem dolor voluptatem.
+        Welcome to your Following Page! This is where you'll find all the latest
+        adventures from the people you follow on Photogram. Get inspired by
+        their journeys, engage with their stories, and share in the excitement
+        of their travels. It's time to explore!
       </Text>
-      <Button className="mt-4" size={"lg"}>
-        Lorem ipsum
+      <Button
+        className="mt-4"
+        size={"lg"}
+        onClick={() => setPostCreateDialogVisibility(true)}
+      >
+        Create a new post
       </Button>
       <Posts
         className="mt-10"
