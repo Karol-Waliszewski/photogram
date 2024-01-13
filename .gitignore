@@ -12,6 +12,11 @@
 /prisma/db.sqlite
 /prisma/db.sqlite-journal
 
+# terraform
+terraform.tfstate
+terraform.tfstate.backup
+.terraform
+
 # next.js
 /.next/
 /out/
