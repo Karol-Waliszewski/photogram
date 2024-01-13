@@ -7,6 +7,7 @@ import axios from "axios";
 
 import { type AppRouter } from "@/server/api/root";
 import { type NewPostFormSchema } from "@/components/organisms/NewPostDialog";
+import { getImageNameFromUrl } from "@/utils/image";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
@@ -31,6 +32,7 @@ export const usePostCreate = () => {
   const [isError, setIsError] = useState(false);
   const { mutateAsync: savePost } = api.post.create.useMutation();
   const { mutateAsync: getSignedUrl } = api.storage.getSignedUrl.useMutation();
+  const { mutateAsync: getImageAlt } = api.storage.getImageAlt.useMutation();
   const trpc = api.useUtils();
 
   const createPost = async (data: NewPostFormSchema) => {
@@ -44,11 +46,25 @@ export const usePostCreate = () => {
         }),
       );
 
-      console.log(urls);
+      const images = await Promise.all(
+        urls.map(async (url) => {
+          try {
+            return {
+              url,
+              alt: await getImageAlt({
+                imageUrl: getImageNameFromUrl(url),
+              }),
+            };
+          } catch (error) {
+            console.error(error);
+            return { url, alt: "" };
+          }
+        }),
+      );
 
       await savePost({
         description: data.description,
-        images: urls,
+        images,
       });
 
       await trpc.post.invalidate();
