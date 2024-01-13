@@ -44,6 +44,8 @@ export const usePostCreate = () => {
         }),
       );
 
+      console.log(urls);
+
       await savePost({
         description: data.description,
         images: urls,
@@ -54,6 +56,7 @@ export const usePostCreate = () => {
     } catch (error) {
       console.error(error);
       setIsError(true);
+      throw new Error("Failed to create post");
     } finally {
       setIsLoading(false);
     }
