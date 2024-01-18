@@ -18,7 +18,7 @@ locals {
 provider "aws" {
   access_key = local.dot_env["AWS_KEY_ID"]
   secret_key = local.dot_env["AWS_SECRET"]
-  region     = local.dot_env["AWS_REGION"]
+  region     = local.dot_env["AWS_REGION_KEY"]
 }
 
 resource "aws_s3_bucket" "photogram_bucket" {

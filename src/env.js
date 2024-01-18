@@ -34,7 +34,7 @@ export const env = createEnv({
     AWS_KEY_ID: z.string(),
     AWS_SECRET: z.string(),
     AWS_BUCKET_NAME: z.string(),
-    AWS_REGION: z.string(),
+    AWS_REGION_KEY: z.string(),
     // Add ` on ID and SECRET if you want to make sure they're not empty
     DISCORD_CLIENT_ID: z.string(),
     DISCORD_CLIENT_SECRET: z.string(),
@@ -64,7 +64,7 @@ export const env = createEnv({
     AWS_KEY_ID: process.env.AWS_KEY_ID,
     AWS_SECRET: process.env.AWS_SECRET,
     AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
-    AWS_REGION: process.env.AWS_REGION,
+    AWS_REGION_KEY: process.env.AWS_REGION_KEY,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
