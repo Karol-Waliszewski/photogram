@@ -27,7 +27,13 @@ Once you have these prerequisites, you can proceed with the setup and deployment
 First, clone the repository:
 
 ```bash
-git clone ...
+git clone https://github.com/Karol-Waliszewski/photogram.git
+```
+
+Then, go to the project directory:
+
+```bash
+cd photogram
 ```
 
 Then, install the dependencies with yarn (I recommend using yarn, but you can use npm as well):
